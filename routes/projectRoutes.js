@@ -104,11 +104,11 @@ app.put("/:id", (req, res) => {
       .status(404)
       .send({ msg: "The project with the given id was not found" });
 
-  if (title) resumes.title = title;
-  if (details) resumes.details = details;
-  if (img) resumes.img = img;
-  if (github) resumes.github = github;
-  if (netlify) resumes.netlify = netlify;
+  if (title) project.title = title;
+  if (details) project.details = details;
+  if (img) project.img = img;
+  if (github) project.github = github;
+  if (netlify) project.netlify = netlify;
 
   res.send(project);
 });

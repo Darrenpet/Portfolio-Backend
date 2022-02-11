@@ -102,10 +102,10 @@ app.put("/:id", (req, res) => {
       .status(404)
       .send({ msg: "The testimonial with the given id was not found" });
 
-  if (name) resumes.name = name;
-  if (quote) resumes.quote = quote;
-  if (img) resumes.img = img;
-  if (relation) resumes.relation = relation;
+  if (name) testimonial.name = name;
+  if (quote) testimonial.quote = quote;
+  if (img) testimonial.img = img;
+  if (relation) testimonial.relation = relation;
 
   res.send(testimonial);
 });
