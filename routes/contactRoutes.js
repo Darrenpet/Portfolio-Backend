@@ -15,12 +15,12 @@ app.post("/", (req, res) => {
     service: "gmail",
     auth: {
       user: process.env.EMAIL,
-      pass: process.env.PASSWORD,
+      pass: process.env.PASS,
     },
   });
 
   const mailOptions = {
-    from: email,
+    from: `${email}`,
     to: "darrenpetersen16@gmail.com",
     subject: "This is from portfolio",
     text: `${name} has messaged you, saying:
