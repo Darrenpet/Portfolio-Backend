@@ -7,7 +7,8 @@ app.get("/", (req, res) => res.send({ msg: "Send contact using POST" }));
 
 app.post("/", (req, res) => {
   const { name, email, message } = req.body;
-  console.log(process.env.USER, process.env.PASS);
+
+  console.log(process.env.EMAIL, process.env.PASS);
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -21,7 +22,7 @@ app.post("/", (req, res) => {
 
   const mailOptions = {
     from: `${email}`,
-    to: "darrenpetersen16@gmail.com",
+    to: `${process.env.EMAIL}`,
     subject: "This is from portfolio",
     text: `${name} has messaged you, saying:
     
