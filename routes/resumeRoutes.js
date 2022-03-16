@@ -1,103 +1,69 @@
+require("dotenv").config;
+
 const express = require("express");
+const Resume = require("../models/Resume");
+const { getResume } = require("../middleware/finders");
+
 const app = express.Router();
 
-const resume = [
-  {
-    id: 1,
-    date: "2021/Present",
-    event: "Web development and Coding",
-    place: "LifeChoices Academy",
-    details:
-      "Started a Web development and Coding Course at LifeChoices Academy. I have started learning the following languages: HTML, CSS, JavaScript, MySQL, Vue, Front-End and Back-End development.",
-  },
-  {
-    id: 2,
-    date: "2016/2017",
-    event: "Higher Certificate in Accounting Science",
-    place: "Univercity of South Africa (UNISA)",
-    details:
-      "Started my Higher Certificate in Accounting Science. Subjects that I finished are: BNU1501, CAS1501, CLA1503, ENN1504, FAC1501, MNB1501, MAC1501 and TAX1501. I had to drop out from the course due to financial reasons. Subjects that are outstanding: AUE1501 and FAC1502.",
-  },
-  {
-    id: 3,
-    date: "2014/2020",
-    event: "Accountant/Bookkeeper",
-    place: "Muizenberg Bowling and Croquet Club",
-    details:
-      "Started doing volunteer bookkeeping and admin work at Muizenberg Bowling and Croquet Club.",
-  },
-  {
-    id: 4,
-    date: "2014/2014",
-    event: "Bachelors Pass",
-    place: "Muizenberg High School",
-    details: "Finished my matric with a Bachelors Pass.",
-  },
-];
-
-function fixArrayID(arr) {
-  return arr.forEach((item, index) => (item.id = index + 1));
-}
-
 // GET ALL RESUME
-app.get("/", (req, res) => {
-  res.send(resume);
+app.get("/", async (req, res) => {
+  try {
+    const resumes = await Resume.find();
+    res.status(201).send(resumes);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
 });
 
 // GET ONE RESUME
-app.get("/:id", (req, res) => {
-  const resumes = resume.find(
-    (resumes) => resumes.id === parseInt(req.params.id)
-  );
-  if (!resumes)
-    res
-      .status(404)
-      .send({ msg: "The resume with that given id was not found" });
-  res.send(resumes);
+app.get("/:id", getResume, (req, res) => {
+  res.send(res.resume);
 });
 
 // CREATE A RESUME
-app.post("/", (req, res) => {
-  const { date, event, place, details } = req.body;
+app.post("/", async (req, res) => {
+  const { date, place, event, details } = req.body;
 
-  if (!date || !event || !place || !details)
-    return res.status(400).send({ msg: "Not all data sent" });
-
-  const resumes = {
-    id: resume.length + 1,
+  let resume = new Resume({
     date,
-    event,
     place,
+    event,
     details,
-  };
-  resume.push(resumes);
-  res.send(resumes);
+  });
+
+  try {
+    const newResume = await resume.save();
+    res.status(201).json(newResume);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
 // UPDATE RESUME
-app.put("/:id", (req, res) => {
-  const { date, event, place, details } = req.body;
-  const resumes = resume.find(
-    (resumes) => resumes.id === parseInt(req.params.id)
-  );
-  if (!resumes)
-    res
-      .status(404)
-      .send({ msg: "The resumes with the given id was not found" });
+app.put("/:id", getResume, async (req, res) => {
+  const { date, place, event, details } = req.body;
+  if (date) res.resume.date = date;
+  if (place) res.resume.place = place;
+  if (event) res.resume.event = event;
+  if (details) res.resume.details = details;
 
-  if (date) resumes.date = date;
-  if (event) resumes.event = event;
-  if (place) resumes.place = place;
-  if (details) resumes.details = details;
-
-  res.send(resumes);
+  try {
+    const updatedResume = await res.resume.save();
+    res.status(201).send(updatedResume);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
 // DELETE RESUME
-app.delete("/:id", (req, res) => {
-  resumes = resume.filter((resumes) => resumes.id != req.params.id);
-  fixArrayID(resumes);
-  res.send({ msg: "Resume has been deleted" });
+app.delete("/:id", getResume, async (req, res) => {
+  try {
+    await res.resume.remove();
+    res.json({ message: "Deleted resume" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 module.exports = app;
