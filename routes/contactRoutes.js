@@ -26,7 +26,9 @@ app.post("/", (req, res) => {
     subject: "This is from portfolio",
     text: `${name} has messaged you, saying:
     
-    ${message}`,
+    ${message}
+    
+    Get back to them via ${email}`,
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
